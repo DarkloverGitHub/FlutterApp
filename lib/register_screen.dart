@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'login_screen.dart';
 import 'home_screen.dart';
+
+// ══════════════════════════════════════════════
+//  REGISTER SCREEN
+//  File: lib/screens/register_screen.dart
+//
+//  Widgets used:
+//   • Scaffold        → page scaffold with AppBar
+//   • AppBar          → top bar with Back button
+//   • SingleChildScrollView → scrollable form
+//   • Stack           → overlaps camera badge on avatar
+//   • Positioned      → places badge at bottom-right
+//   • _buildInputRow  → reusable helper for each field
+//   • ElevatedButton  → Register button
+// ══════════════════════════════════════════════
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -11,227 +23,233 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  // One controller per input field
+  final _nameCtrl     = TextEditingController();
+  final _emailCtrl    = TextEditingController();
+  final _usernameCtrl = TextEditingController();
+  final _passCtrl     = TextEditingController();
+  final _confirmCtrl  = TextEditingController();
 
-  static const String _googleSvg = '''
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
-  <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.2 0 24 0 14.6 0 6.6 5.6 2.7 13.7l7.9 6.1C12.5 13.5 17.8 9.5 24 9.5z"/>
-  <path fill="#4285F4" d="M46.6 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.5-4.1 7.1-10.2 7.1-17.1z"/>
-  <path fill="#FBBC05" d="M10.6 28.6A14.8 14.8 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.5 10.8l8.1-6.2z"/>
-  <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.6-5.9c-2 1.4-4.7 2.2-7.6 2.2-6.2 0-11.5-4.2-13.4-9.8l-8.1 6.2C6.6 42.5 14.6 48 24 48z"/>
-</svg>''';
+  // Toggle password visibility independently
+  bool _obscurePass    = true;
+  bool _obscureConfirm = true;
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
+    // Always dispose all controllers
+    _nameCtrl.dispose();
+    _emailCtrl.dispose();
+    _usernameCtrl.dispose();
+    _passCtrl.dispose();
+    _confirmCtrl.dispose();
     super.dispose();
+  }
+
+  void _handleRegister() {
+    // pushReplacement → go to Home, clear navigation stack
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+  }
+
+  // ── Reusable input row builder ──
+  // Instead of copying the same Container 5 times,
+  // we make a helper method that takes parameters.
+  Widget _buildInputRow({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool obscure = false,         // is this a password field?
+    bool showEye = false,         // show toggle icon?
+    VoidCallback? onEyeTap,       // what happens when eye is tapped
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          const SizedBox(width: 14),
+          // Leading icon
+          Icon(icon, color: Colors.grey.shade400, size: 20),
+          const SizedBox(width: 10),
+          // Text input (no border — parent Container draws it)
+          Expanded(
+            child: TextField(
+              controller: controller,
+              obscureText: obscure,
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(color: Colors.grey.shade400),
+                border: InputBorder.none, // remove default border
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+          // Eye icon (only for password fields)
+          if (showEye)
+            IconButton(
+              icon: Icon(
+                obscure ? Icons.visibility_off : Icons.visibility,
+                color: Colors.grey.shade400,
+                size: 20,
+              ),
+              onPressed: onEyeTap,
+            ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
 
-              const Text(
-                "Hello! Register to get started",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
+      // ── AppBar with Back arrow ──
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black54),
+          onPressed: () => Navigator.pop(context), // go back to Login
+        ),
+      ),
 
-              const SizedBox(height: 28),
-
-              TextField(
-                controller: _firstNameController,
-                decoration: InputDecoration(
-                  hintText: "First Name",
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        child: Column(
+          children: [
+            // ── 1. Avatar circle with camera badge ──
+            // Stack lets two widgets sit on top of each other
+            Stack(
+              children: [
+                // Blue circle with person icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFDDE9FF),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 44,
+                    color: Color(0xFF3478F6),
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: _lastNameController,
-                decoration: InputDecoration(
-                  hintText: "Last Name",
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: "Email",
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: "Password",
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6C63FF),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                // Camera badge pinned to bottom-right of the Stack
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey.shade300),
                     ),
+                    child: const Icon(Icons.camera_alt, size: 15),
                   ),
-                  onPressed: () {
-                    // ✅ Register → HomeScreen
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeScreen()),
-                    );
-                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+
+            // ── 2. Title & subtitle ──
+            const Text(
+              'Create Account',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Fill in the details to get started',
+              style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+            const SizedBox(height: 26),
+
+            // ── 3. Input Fields ──
+            _buildInputRow(
+              controller: _nameCtrl,
+              hint: 'Full Name',
+              icon: Icons.person_outline,
+            ),
+            _buildInputRow(
+              controller: _emailCtrl,
+              hint: 'Email',
+              icon: Icons.email_outlined,
+            ),
+            _buildInputRow(
+              controller: _usernameCtrl,
+              hint: 'Username',
+              icon: Icons.alternate_email,
+            ),
+            _buildInputRow(
+              controller: _passCtrl,
+              hint: 'Password',
+              icon: Icons.lock_outline,
+              obscure: _obscurePass,
+              showEye: true,
+              onEyeTap: () => setState(() => _obscurePass = !_obscurePass),
+            ),
+            _buildInputRow(
+              controller: _confirmCtrl,
+              hint: 'Confirm Password',
+              icon: Icons.lock_outline,
+              obscure: _obscureConfirm,
+              showEye: true,
+              onEyeTap: () =>
+                  setState(() => _obscureConfirm = !_obscureConfirm),
+            ),
+            const SizedBox(height: 8),
+
+            // ── 4. Register Button ──
+            SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: ElevatedButton(
+                onPressed: _handleRegister,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3478F6),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  'Register',
+                  style:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+
+            // ── 5. Already have account link ──
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Already have an account? ',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context), // back to Login
                   child: const Text(
-                    "Register",
+                    'Login',
                     style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              const Center(
-                child: Text(
-                  "Or Login with",
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        side: const BorderSide(color: Color(0xFFE0E0E0)),
-                      ),
-                      onPressed: () {},
-                      child: SvgPicture.asset(
-                        "assets/images/facebook.svg",
-                        height: 24,
-                        width: 24,
-                      ),
+                      color: Color(0xFF3478F6),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        side: const BorderSide(color: Color(0xFFE0E0E0)),
-                      ),
-                      onPressed: () {},
-                      child: SvgPicture.string(
-                        _googleSvg,
-                        height: 24,
-                        width: 24,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Already have an account? ",
-                      style: TextStyle(color: Colors.black54, fontSize: 13),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginScreen()),
-                        );
-                      },
-                      child: const Text(
-                        "Login Now",
-                        style: TextStyle(
-                          color: Color(0xFF6C63FF),
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
       ),
     );

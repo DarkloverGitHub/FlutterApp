@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'register_screen.dart';
 import 'home_screen.dart';
+import 'password_screen.dart';
+
+// ══════════════════════════════════════════════
+//  LOGIN SCREEN
+//  File: lib/screens/login_screen.dart
+// ══════════════════════════════════════════════
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,23 +16,40 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _passwordVisible = false;
 
-  static const String _googleSvg = '''
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
-  <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.2 0 24 0 14.6 0 6.6 5.6 2.7 13.7l7.9 6.1C12.5 13.5 17.8 9.5 24 9.5z"/>
-  <path fill="#4285F4" d="M46.6 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.5-4.1 7.1-10.2 7.1-17.1z"/>
-  <path fill="#FBBC05" d="M10.6 28.6A14.8 14.8 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.5 10.8l8.1-6.2z"/>
-  <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.6-5.9c-2 1.4-4.7 2.2-7.6 2.2-6.2 0-11.5-4.2-13.4-9.8l-8.1 6.2C6.6 42.5 14.6 48 24 48z"/>
-</svg>''';
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  // ── Login → go to Home ──
+  void _handleLogin() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+  }
+
+  // ── Forgot Password → open ForgotPasswordScreen ──
+  void _handleForgotPassword() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+    );
+  }
+
+  // ── Register → open RegisterScreen ──
+  void _handleRegister() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+    );
   }
 
   @override
@@ -36,175 +58,145 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
 
-              const Text(
-                "Welcome back! Glad to\nsee you, Again!",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              // ── 1. Blue avatar circle ──
+              Container(
+                width: 90,
+                height: 90,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF3478F6),
+                  shape: BoxShape.circle,
                 ),
+                child: const Icon(Icons.person, size: 50, color: Colors.white),
               ),
+              const SizedBox(height: 20),
 
-              const SizedBox(height: 32),
+              // ── 2. Title ──
+              const Text(
+                'Login',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
 
+              // ── 3. Subtitle ──
+              const Text(
+                'Please enter your credentials to login',
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 36),
+
+              // ── 4. Username TextField ──
               TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
+                controller: _usernameController,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
-                  hintText: "Enter your email",
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
+                  labelText: 'Username',
+                  labelStyle: const TextStyle(color: Color(0xFF3478F6)),
+                  hintText: 'Enter your username',
+                  prefixIcon: const Icon(Icons.person_outline),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        const BorderSide(color: Color(0xFF3478F6), width: 2),
                   ),
                 ),
               ),
+              const SizedBox(height: 18),
 
-              const SizedBox(height: 14),
-
+              // ── 5. Password TextField ──
               TextField(
                 controller: _passwordController,
-                obscureText: !_passwordVisible,
+                obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  hintText: "Enter your password",
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
+                  labelText: 'Password',
+                  labelStyle: const TextStyle(color: Color(0xFF3478F6)),
+                  hintText: 'Enter your password',
+                  prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _passwordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.grey,
                     ),
-                    onPressed: () =>
-                        setState(() => _passwordVisible = !_passwordVisible),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide:
+                        const BorderSide(color: Color(0xFF3478F6), width: 2),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              // ── 6. Forgot Password ──
+              // ✅ ONE button only — calls _handleForgotPassword()
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: _handleForgotPassword,
+                  child: const Text(
+                    'Forgot password?',
+                    style: TextStyle(color: Color(0xFF3478F6)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
 
+              // ── 7. Submit Button ──
               SizedBox(
                 width: double.infinity,
+                height: 54,
                 child: ElevatedButton(
+                  onPressed: _handleLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6C63FF),
+                    backgroundColor: const Color(0xFF3478F6),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  onPressed: () {
-                    // ✅ Login → HomeScreen
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeScreen()),
-                    );
-                  },
                   child: const Text(
-                    "Login",
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                    'Submit',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
 
-              const SizedBox(height: 20),
-
-              const Center(
-                child: Text(
-                  "Or Login with",
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
+              // ── 8. Register link ──
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        side: const BorderSide(color: Color(0xFFE0E0E0)),
-                      ),
-                      onPressed: () {},
-                      child: SvgPicture.asset(
-                        "assets/images/facebook.svg",
-                        height: 24,
-                        width: 24,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        side: const BorderSide(color: Color(0xFFE0E0E0)),
-                      ),
-                      onPressed: () {},
-                      child: SvgPicture.string(
-                        _googleSvg,
-                        height: 24,
-                        width: 24,
+                  const Text('No account? ',
+                      style: TextStyle(color: Colors.grey)),
+                  GestureDetector(
+                    onTap: _handleRegister,
+                    child: const Text(
+                      'Register',
+                      style: TextStyle(
+                        color: Color(0xFF3478F6),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 24),
-
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Don't have an account? ",
-                      style: TextStyle(color: Colors.black54, fontSize: 13),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const RegisterScreen()),
-                        );
-                      },
-                      child: const Text(
-                        "Register Now",
-                        style: TextStyle(
-                          color: Color(0xFF6C63FF),
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
