@@ -19,7 +19,7 @@ class WelcomeScreen extends StatelessWidget {
               // ── Illustration ──────────────────────────────────────────
               Expanded(
                 child: Image.asset(
-                  'assets/images/Logo.png',
+                  'lib/images/Logo.png',
                   fit: BoxFit.contain,
                 ),
               ),

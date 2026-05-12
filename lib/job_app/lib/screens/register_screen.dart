@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/social_buttons.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -47,10 +47,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Center(
           child: SingleChildScrollView(
             child: Container(
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 24, vertical: 36),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(28),
@@ -67,7 +66,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // ── Title ────────────────────────────────────────────
                     const Text(
                       'Create Account',
                       textAlign: TextAlign.center,
@@ -77,9 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     const Text(
                       'Create an account so you can explore all\nthe existing jobs',
                       textAlign: TextAlign.center,
@@ -89,29 +85,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         height: 1.5,
                       ),
                     ),
-
                     const SizedBox(height: 36),
-
-                    // ── Email (active/focused style – orange border) ──────
+                    // Email — orange border (focused style from mockup)
                     _buildField(
                       controller: _emailCtrl,
                       hint: 'Email',
                       keyboardType: TextInputType.emailAddress,
                       autofocus: true,
-                      validator: (v) =>
-                          v == null || !v.contains('@')
-                              ? 'Enter a valid email'
-                              : null,
+                      filled: true,
+                      validator: (v) => v == null || !v.contains('@')
+                          ? 'Enter a valid email'
+                          : null,
                     ),
-
                     const SizedBox(height: 16),
-
-                    // ── Password ─────────────────────────────────────────
+                    // Password — grey bg
                     _buildField(
                       controller: _passCtrl,
                       hint: 'Password',
                       obscure: _obscure,
-                      filled: false, // light grey like mockup
+                      filled: false,
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscure
@@ -123,29 +115,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onPressed: () =>
                             setState(() => _obscure = !_obscure),
                       ),
-                      validator: (v) =>
-                          v == null || v.length < 6
-                              ? 'Min 6 characters'
-                              : null,
+                      validator: (v) => v == null || v.length < 6
+                          ? 'Min 6 characters'
+                          : null,
                     ),
-
                     const SizedBox(height: 16),
-
-                    // ── Confirm Password ─────────────────────────────────
+                    // Confirm Password — grey bg
                     _buildField(
                       controller: _confirmCtrl,
                       hint: 'Confirm Password',
                       obscure: _obscure,
                       filled: false,
-                      validator: (v) =>
-                          v != _passCtrl.text
-                              ? 'Passwords do not match'
-                              : null,
+                      validator: (v) => v != _passCtrl.text
+                          ? 'Passwords do not match'
+                          : null,
                     ),
-
                     const SizedBox(height: 32),
-
-                    // ── Sign up button ───────────────────────────────────
                     SizedBox(
                       height: 52,
                       child: ElevatedButton(
@@ -158,26 +143,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
+                              fontSize: 16, fontWeight: FontWeight.w700),
                         ),
                         child: _loading
                             ? const SizedBox(
                                 width: 22,
                                 height: 22,
                                 child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.5,
-                                ),
+                                    color: Colors.white, strokeWidth: 2.5),
                               )
                             : const Text('Sign up'),
                       ),
                     ),
-
                     const SizedBox(height: 18),
-
-                    // ── Already have account ─────────────────────────────
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: const Text(
@@ -190,10 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 32),
-
-                    // ── Divider ──────────────────────────────────────────
                     Row(
                       children: const [
                         Expanded(
@@ -215,25 +190,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: AppTheme.border, thickness: 1)),
                       ],
                     ),
-
                     const SizedBox(height: 24),
-
-                    // ── Social buttons ───────────────────────────────────
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _SocialBtn(
-                            assetPath: 'assets/images/google.svg',
-                            isSvg: true),
-                        const SizedBox(width: 16),
-                        _SocialBtn(
-                            assetPath: 'assets/images/facebook.svg',
-                            isSvg: true),
-                        const SizedBox(width: 16),
-                        const _SocialBtn(
-                            icon: Icons.apple, isSvg: false),
-                      ],
-                    ),
+                    // ✅ Uses inline SVG — renders correctly on web & mobile
+                    const SocialLoginButtons(),
                   ],
                 ),
               ),
@@ -266,8 +225,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         hintStyle:
             const TextStyle(color: AppTheme.textGrey, fontSize: 15),
         filled: true,
-        fillColor:
-            filled ? AppTheme.primaryLight : const Color(0xFFF5F5F5),
+        fillColor: filled
+            ? AppTheme.primaryLight
+            : const Color(0xFFF5F5F5),
         suffixIcon: suffixIcon,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -290,44 +250,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide:
-              const BorderSide(color: Colors.red, width: 1.5),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
         ),
-      ),
-    );
-  }
-}
-
-// ── Shared social button ─────────────────────────────────────────────────────
-
-class _SocialBtn extends StatelessWidget {
-  final String? assetPath;
-  final IconData? icon;
-  final bool isSvg;
-
-  const _SocialBtn({this.assetPath, this.icon, required this.isSvg});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.border, width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Center(
-        child: isSvg && assetPath != null
-            ? SvgPicture.asset(assetPath!, width: 24, height: 24)
-            : Icon(icon, size: 24, color: Colors.black),
       ),
     );
   }

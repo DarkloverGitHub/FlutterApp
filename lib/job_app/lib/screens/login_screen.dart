@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/social_buttons.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,13 +40,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF0EC), // warm peach bg
+      backgroundColor: const Color(0xFFFAF0EC),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(28),
@@ -63,7 +64,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // ── Title ───────────────────────────────────────────
                     const Text(
                       'Login here',
                       textAlign: TextAlign.center,
@@ -73,9 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     const Text(
                       "Welcome back you've\nbeen missed!",
                       textAlign: TextAlign.center,
@@ -86,23 +84,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 1.4,
                       ),
                     ),
-
                     const SizedBox(height: 36),
-
-                    // ── Email ────────────────────────────────────────────
                     _buildField(
                       controller: _emailCtrl,
                       hint: 'Email',
                       keyboardType: TextInputType.emailAddress,
-                      validator: (v) =>
-                          v == null || !v.contains('@')
-                              ? 'Enter a valid email'
-                              : null,
+                      validator: (v) => v == null || !v.contains('@')
+                          ? 'Enter a valid email'
+                          : null,
                     ),
-
                     const SizedBox(height: 16),
-
-                    // ── Password ─────────────────────────────────────────
                     _buildField(
                       controller: _passCtrl,
                       hint: 'Password',
@@ -118,15 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () =>
                             setState(() => _obscure = !_obscure),
                       ),
-                      validator: (v) =>
-                          v == null || v.length < 4
-                              ? 'Min 4 characters'
-                              : null,
+                      validator: (v) => v == null || v.length < 4
+                          ? 'Min 4 characters'
+                          : null,
                     ),
-
                     const SizedBox(height: 10),
-
-                    // ── Forgot password ──────────────────────────────────
                     Align(
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
@@ -141,10 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 24),
-
-                    // ── Sign in button ───────────────────────────────────
                     SizedBox(
                       height: 52,
                       child: ElevatedButton(
@@ -157,28 +141,22 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
+                              fontSize: 16, fontWeight: FontWeight.w700),
                         ),
                         child: _loading
                             ? const SizedBox(
                                 width: 22,
                                 height: 22,
                                 child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.5,
-                                ),
+                                    color: Colors.white, strokeWidth: 2.5),
                               )
                             : const Text('Sign in'),
                       ),
                     ),
-
                     const SizedBox(height: 18),
-
-                    // ── Create account link ──────────────────────────────
                     GestureDetector(
-                      onTap: () => Navigator.pushNamed(context, '/register'),
+                      onTap: () =>
+                          Navigator.pushNamed(context, '/register'),
                       child: const Text(
                         'Create new account',
                         textAlign: TextAlign.center,
@@ -189,16 +167,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 32),
-
-                    // ── Divider ──────────────────────────────────────────
                     _buildDivider(),
-
                     const SizedBox(height: 24),
-
-                    // ── Social buttons ───────────────────────────────────
-                    _buildSocialRow(),
+                    // ✅ Uses inline SVG — renders correctly on web & mobile
+                    const SocialLoginButtons(),
                   ],
                 ),
               ),
@@ -251,8 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide:
-              const BorderSide(color: Colors.red, width: 1.5),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
         ),
       ),
     );
@@ -275,54 +247,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         Expanded(child: Divider(color: AppTheme.border, thickness: 1)),
       ],
-    );
-  }
-
-  Widget _buildSocialRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _SocialBtn(assetPath: 'assets/images/google.svg', isSvg: true),
-        const SizedBox(width: 16),
-        _SocialBtn(assetPath: 'assets/images/facebook.svg', isSvg: true),
-        const SizedBox(width: 16),
-        _SocialBtn(icon: Icons.apple, isSvg: false),
-      ],
-    );
-  }
-}
-
-// ── Social button ────────────────────────────────────────────────────────────
-
-class _SocialBtn extends StatelessWidget {
-  final String? assetPath;
-  final IconData? icon;
-  final bool isSvg;
-
-  const _SocialBtn({this.assetPath, this.icon, required this.isSvg});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.border, width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Center(
-        child: isSvg && assetPath != null
-            ? SvgPicture.asset(assetPath!, width: 24, height: 24)
-            : Icon(icon, size: 24, color: Colors.black),
-      ),
     );
   }
 }
