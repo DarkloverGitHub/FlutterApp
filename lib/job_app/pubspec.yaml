@@ -13,6 +13,7 @@ dependencies:
   device_preview: ^1.1.0
   flutter_svg: ^2.0.9
   cupertino_icons: ^1.0.6
+  image_picker: ^1.0.7        # ← picks photo from camera or gallery
 
 dev_dependencies:
   flutter_test:
